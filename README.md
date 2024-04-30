@@ -6,3 +6,4 @@
 3. style reset 설치: `npm i styled-reset`
 4. styled-component 설치: `npm i styled-components@6.0.7`
 5. styled-component typescript 사용하기 위해 설치: `npm i -D @types/styled-components`
+6. firebase 프로젝트 생성 후 설치: `npm install firebase@10.1.0`
