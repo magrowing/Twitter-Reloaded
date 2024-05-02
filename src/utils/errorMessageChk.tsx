@@ -9,7 +9,13 @@ export const errorMessageChk = (code: string) => {
     case 'auth/weak-password': {
       return '비밀번호는 6글자 이상이어야 합니다.';
     }
+    case 'auth/user-not-found': {
+      return '이메일 일치하지 않습니다.';
+    }
+    case 'auth/wrong-password': {
+      return '비밀번호가 일치하지 않습니다.';
+    }
     default:
-      return `${code} : 회원가입에 실패 하였습니다.`;
+      return `${code} : 실패하였습니다.`;
   }
 };
