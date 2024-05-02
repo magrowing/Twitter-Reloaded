@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 
+import { useNavigate } from 'react-router-dom';
+
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { auth } from '../firebase';
+
 import styled from 'styled-components';
 
 const Wrapper = styled.section`
@@ -56,6 +61,7 @@ export default function CreateAccount() {
     password: '',
   });
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {
@@ -70,11 +76,28 @@ export default function CreateAccount() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (
+      isLoading ||
+      form.name === '' ||
+      form.email === '' ||
+      form.password === ''
+    )
+      return;
     try {
-      // create an account
-      // set the name of the user
-      // redirect to the home page
+      setLoading(true);
+      // 1.create an account : 새로운 계정 생성
+      const credentials = await createUserWithEmailAndPassword(
+        auth,
+        form.email,
+        form.password
+      );
+      console.log(credentials);
+      // 2.set the name of the user : 생성된 유저 프로필 지정
+      await updateProfile(credentials.user, { displayName: form.name });
+      // 3.redirect to the home page : 홈으로 리다이렉션
+      navigate('/', { replace: true });
     } catch (e) {
+      // 이메일이 존재하거나, 비밀번호가 맞지 않는 경우
       //setError
     } finally {
       setLoading(false);
@@ -83,7 +106,7 @@ export default function CreateAccount() {
 
   return (
     <Wrapper>
-      <Title>Login to 𝕏</Title>
+      <Title>Join 𝕏</Title>
       <Form onSubmit={onSubmit}>
         <Input
           type="text"
