@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
+import { FirebaseError } from 'firebase/app';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
 
@@ -18,7 +19,6 @@ const Wrapper = styled.section`
 
 const Title = styled.h1`
   font-size: 42px;
-  margin-bottom: 50px;
 `;
 
 const Form = styled.form`
@@ -26,6 +26,7 @@ const Form = styled.form`
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  margin: 50px 0 10px;
 `;
 
 const Input = styled.input`
@@ -53,6 +54,22 @@ const Error = styled.p`
   color: tomato;
 `;
 
+const errorMsgChk = (code: string) => {
+  switch (code) {
+    case 'auth/invalid-email': {
+      return '잘못된 이메일 형식입니다.';
+    }
+    case 'auth/email-already-in-use': {
+      return '이미 사용 중인 이메일입니다.';
+    }
+    case 'auth/weak-password': {
+      return '비밀번호는 6글자 이상이어야 합니다.';
+    }
+    default:
+      return `${code} : 회원가입에 실패 하였습니다.`;
+  }
+};
+
 export default function CreateAccount() {
   const [isLoading, setLoading] = useState(false);
   const [form, setForm] = useState({
@@ -76,6 +93,7 @@ export default function CreateAccount() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError('');
     if (
       isLoading ||
       form.name === '' ||
@@ -91,14 +109,17 @@ export default function CreateAccount() {
         form.email,
         form.password
       );
-      console.log(credentials);
+      //console.log(credentials);
       // 2.set the name of the user : 생성된 유저 프로필 지정
       await updateProfile(credentials.user, { displayName: form.name });
       // 3.redirect to the home page : 홈으로 리다이렉션
       navigate('/', { replace: true });
     } catch (e) {
       // 이메일이 존재하거나, 비밀번호가 맞지 않는 경우
-      //setError
+      if (e instanceof FirebaseError) {
+        //console.log(e.code, e.message);
+        setError(errorMsgChk(e.code));
+      }
     } finally {
       setLoading(false);
     }
