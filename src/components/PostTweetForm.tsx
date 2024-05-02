@@ -1,5 +1,8 @@
 import { useState } from 'react';
 
+import { auth, db } from '../firebase';
+import { addDoc, collection } from 'firebase/firestore';
+
 import styled from 'styled-components';
 
 const Form = styled.form`
@@ -104,9 +107,31 @@ export default function PostTweetForm() {
     }
   };
 
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user || isLoading || tweet === '' || tweet.length > 180) return;
+
+    try {
+      setLoading(true);
+      await addDoc(collection(db, 'tweets'), {
+        tweet,
+        createdAt: Date.now(),
+        useName: user.displayName || 'Anonymous',
+        userId: user.uid,
+      });
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Form>
+    <Form onSubmit={onSubmit}>
       <TextArea
+        rows={5}
+        maxLength={180}
         placeholder="What is Happening?"
         value={tweet}
         onChange={onChange}
@@ -133,7 +158,7 @@ export default function PostTweetForm() {
         accept="image/*"
         onChange={onFileChange}
       />
-      <SubmitBtn type="button">
+      <SubmitBtn type="submit">
         {isLoading ? 'Posting....' : 'Post Tweet'}
       </SubmitBtn>
     </Form>
