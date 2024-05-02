@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-
 import { useNavigate } from 'react-router-dom';
+
+import styled from 'styled-components';
 
 import { FirebaseError } from 'firebase/app';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../firebase';
 
-import styled from 'styled-components';
+import { errorMessageChk } from '../utils/errorMessageChk';
 
 const Wrapper = styled.section`
   height: 100%;
@@ -53,22 +54,6 @@ const Error = styled.p`
   font-weight: 600;
   color: tomato;
 `;
-
-const errorMsgChk = (code: string) => {
-  switch (code) {
-    case 'auth/invalid-email': {
-      return '잘못된 이메일 형식입니다.';
-    }
-    case 'auth/email-already-in-use': {
-      return '이미 사용 중인 이메일입니다.';
-    }
-    case 'auth/weak-password': {
-      return '비밀번호는 6글자 이상이어야 합니다.';
-    }
-    default:
-      return `${code} : 회원가입에 실패 하였습니다.`;
-  }
-};
 
 export default function CreateAccount() {
   const [isLoading, setLoading] = useState(false);
@@ -118,7 +103,7 @@ export default function CreateAccount() {
       // 이메일이 존재하거나, 비밀번호가 맞지 않는 경우
       if (e instanceof FirebaseError) {
         //console.log(e.code, e.message);
-        setError(errorMsgChk(e.code));
+        setError(errorMessageChk(e.code));
       }
     } finally {
       setLoading(false);
