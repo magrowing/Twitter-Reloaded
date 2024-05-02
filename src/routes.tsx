@@ -5,6 +5,7 @@ import Home from './routes/Home';
 import Profile from './routes/Profile';
 import Login from './routes/Login';
 import CreateAccount from './routes/CreateAccount';
+import FindPassword from './routes/FindPassword';
 
 export const routes = [
   {
@@ -32,5 +33,9 @@ export const routes = [
   {
     path: '/create-account',
     element: <CreateAccount />,
+  },
+  {
+    path: '/find-password',
+    element: <FindPassword />,
   },
 ];

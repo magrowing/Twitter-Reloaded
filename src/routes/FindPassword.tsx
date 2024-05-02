@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { FirebaseError } from 'firebase/app';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../firebase';
 
 import { errorMessageChk } from '../utils/errorMessageChk';
@@ -17,34 +17,25 @@ import {
   Switcher,
 } from '../styles/authStyle';
 
-export default function Login() {
+export default function FindPassword() {
   const [isLoading, setLoading] = useState(false);
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-  });
+  const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {
-      target: { name, value },
-    } = e;
-
-    setForm({
-      ...form,
-      [name]: value,
-    });
+    setEmail(e.target.value);
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
-    if (isLoading || form.email === '' || form.password === '') return;
+    if (isLoading || email === '') return;
     try {
       setLoading(true);
-      await signInWithEmailAndPassword(auth, form.email, form.password);
-      navigate('/', { replace: true });
+      await sendPasswordResetEmail(auth, email);
+      // TODO : alert을 통해 이메일을 통해 확인 필요 메세지 띄울것
+      navigate('/login', { replace: true });
     } catch (e) {
       if (e instanceof FirebaseError) {
         setError(errorMessageChk(e.code));
@@ -53,36 +44,24 @@ export default function Login() {
       setLoading(false);
     }
   };
+
   return (
     <Wrapper>
-      <Title>Log into 𝕏</Title>
+      <Title>Find Password</Title>
       <Form onSubmit={onSubmit}>
         <Input
-          type="email"
+          onChange={onChange}
           name="email"
-          value={form.email}
+          value={email}
           placeholder="Email"
-          onChange={onChange}
+          type="email"
           required
         />
-        <Input
-          type="password"
-          name="password"
-          value={form.password}
-          placeholder="Password"
-          onChange={onChange}
-          required
-        />
-        <Button type="submit">{isLoading ? 'Loading...' : 'Login'}</Button>
+        <Button type="submit">{isLoading ? 'Loading...' : 'Send Email'}</Button>
       </Form>
       {error !== '' ? <Error>{error}</Error> : null}
       <Switcher>
-        Don't have an account?{' '}
-        <Link to="/create-account">Create one &rarr;</Link>
-      </Switcher>
-      <Switcher>
-        Forgot your password?{' '}
-        <Link to="/find-password">Find Password &rarr;</Link>
+        Already have an account? <Link to="/login">Log in &rarr;</Link>
       </Switcher>
     </Wrapper>
   );
