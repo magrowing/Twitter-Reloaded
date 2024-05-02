@@ -1,6 +1,6 @@
 
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+import { getAuth } from 'firebase/auth';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCDbSBiYvNrGrthOwt_s9u6kIgqyVM88zc",
@@ -14,4 +14,6 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
+
+// app에 대한 인증서비스를 이용하겠다라는 의미 
+export const auth = getAuth(app);
