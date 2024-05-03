@@ -1,7 +1,8 @@
 import { useState } from 'react';
 
-import { auth, db } from '../firebase';
-import { addDoc, collection } from 'firebase/firestore';
+import { auth, db, storage } from '../firebase';
+import { collection, addDoc, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import styled from 'styled-components';
 
@@ -73,7 +74,7 @@ const SubmitBtn = styled.button`
   }
 `;
 
-const MAX_IMAGE_SIZE_BYTES = 1024 * 1024 * 2;
+const MAX_IMAGE_SIZE_BYTES = 1024 * 1024 * 1;
 
 export default function PostTweetForm() {
   const [isLoading, setLoading] = useState(false);
@@ -90,9 +91,11 @@ export default function PostTweetForm() {
 
     if (files && files.length === 1) {
       if (files[0].size > MAX_IMAGE_SIZE_BYTES) {
-        alert('최대 2MB까지 업로드 가능합니다.');
+        alert('최대 1MB까지 업로드 가능합니다.');
+        e.target.value = ''; // 동일한 파일할 경우도 있으므로
         return;
       }
+
       // 이미지 미리보기 기능 추가 방식 1
       // const reader = new FileReader();
       // reader.readAsDataURL(files[0]);
@@ -100,26 +103,42 @@ export default function PostTweetForm() {
       //   setImgPath(reader.result as string);
       // };
 
-      setFile(files[0]);
-
       // 이미지 미리보기 기능 추가 방식 2
       setImgPath(URL.createObjectURL(files[0]));
+      setFile(files[0]);
     }
   };
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const user = auth.currentUser;
+    const user = auth.currentUser; // firebase를 통해 유저정보가져오기
+
     if (!user || isLoading || tweet === '' || tweet.length > 180) return;
 
     try {
       setLoading(true);
-      await addDoc(collection(db, 'tweets'), {
+      const doc = await addDoc(collection(db, 'tweets'), {
         tweet,
         createdAt: Date.now(),
         useName: user.displayName || 'Anonymous',
         userId: user.uid,
       });
+      if (file) {
+        const locationRef = ref(
+          storage,
+          `tweets/${user.uid}-${user.displayName}/${doc.id}`
+        ); // url : tweets 폴더생성 / 유저고유의 아이디 /트윗문서ID 설정
+
+        const result = await uploadBytes(locationRef, file);
+        const url = await getDownloadURL(result.ref); // 퍼블릭 URL 받음
+        await updateDoc(doc, {
+          photo: url,
+        });
+      }
+      // 모든 필트 초기화 작업
+      setTweet('');
+      setFile(null);
+      setImgPath('');
     } catch (e) {
       console.log(e);
     } finally {
@@ -135,6 +154,7 @@ export default function PostTweetForm() {
         placeholder="What is Happening?"
         value={tweet}
         onChange={onChange}
+        required
       />
       {imgPath && <PreviewImg src={imgPath} />}
       <AttachFileButton htmlFor="file">
