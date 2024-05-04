@@ -19,19 +19,35 @@ const Menu = styled.nav`
   flex-direction: column;
   align-items: center;
   gap: 20px;
+
+  a {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
 `;
 
-const MenuItem = styled.span`
+const Button = styled.button`
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+
+  span {
+    color: #1d9bf0;
+  }
+`;
+
+const MenuIcon = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
   width: 50px;
   height: 50px;
-  border: 2px solid white;
-  border-radius: 50%;
 
   svg {
-    width: 30px;
+    width: 28px;
     fill: #fff;
   }
 
@@ -41,6 +57,12 @@ const MenuItem = styled.span`
       fill: #1d9bf0;
     }
   }
+`;
+
+const MenuTitle = styled.span`
+  font-size: 14px;
+  color: #fff;
+  font-weight: 700;
 `;
 
 export default function Layout() {
@@ -56,7 +78,21 @@ export default function Layout() {
     <Wrapper>
       <Menu>
         <Link to="/">
-          <MenuItem>
+          <MenuIcon>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-6 h-6"
+            >
+              <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
+              <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
+            </svg>
+          </MenuIcon>
+          <MenuTitle>Home</MenuTitle>
+        </Link>
+        <Link to="/profile">
+          <MenuIcon>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -69,35 +105,26 @@ export default function Layout() {
                 clipRule="evenodd"
               />
             </svg>
-          </MenuItem>
+          </MenuIcon>
+          <MenuTitle>Profile</MenuTitle>
         </Link>
-        <Link to="/profile">
-          <MenuItem>
+        <Button type="button" onClick={onLogOut}>
+          <MenuIcon className="logout">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
               className="w-6 h-6"
             >
-              <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z" />
-              <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z" />
+              <path
+                fillRule="evenodd"
+                d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm5.03 4.72a.75.75 0 0 1 0 1.06l-1.72 1.72h10.94a.75.75 0 0 1 0 1.5H10.81l1.72 1.72a.75.75 0 1 1-1.06 1.06l-3-3a.75.75 0 0 1 0-1.06l3-3a.75.75 0 0 1 1.06 0Z"
+                clipRule="evenodd"
+              />
             </svg>
-          </MenuItem>
-        </Link>
-        <MenuItem className="logout" onClick={onLogOut}>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            className="w-6 h-6"
-          >
-            <path
-              fillRule="evenodd"
-              d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm5.03 4.72a.75.75 0 0 1 0 1.06l-1.72 1.72h10.94a.75.75 0 0 1 0 1.5H10.81l1.72 1.72a.75.75 0 1 1-1.06 1.06l-3-3a.75.75 0 0 1 0-1.06l3-3a.75.75 0 0 1 1.06 0Z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </MenuItem>
+          </MenuIcon>
+          <MenuTitle>Logout</MenuTitle>
+        </Button>
       </Menu>
       <Outlet />
     </Wrapper>
