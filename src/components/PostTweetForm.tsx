@@ -124,10 +124,7 @@ export default function PostTweetForm() {
         userId: user.uid,
       });
       if (file) {
-        const locationRef = ref(
-          storage,
-          `tweets/${user.uid}-${user.displayName}/${doc.id}`
-        ); // url : tweets 폴더생성 / 유저고유의 아이디 /트윗문서ID 설정
+        const locationRef = ref(storage, `tweets/${user.uid}/${doc.id}`); // url : tweets 폴더생성 / 유저고유의 아이디 /트윗문서ID 설정
 
         const result = await uploadBytes(locationRef, file);
         const url = await getDownloadURL(result.ref); // 퍼블릭 URL 받음
