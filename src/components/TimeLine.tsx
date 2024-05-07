@@ -28,6 +28,15 @@ export interface ITweet {
 
 export default function TimeLine() {
   const [tweets, setTweets] = useState<ITweet[]>([]);
+  const [active, setActive] = useState('');
+
+  const handleToggle = (id: string) => {
+    if (active === id) {
+      setActive('');
+    } else {
+      setActive(id);
+    }
+  };
 
   useEffect(() => {
     let unsubscribe: Unsubscribe | null = null;
@@ -64,7 +73,12 @@ export default function TimeLine() {
   return (
     <Wrapper>
       {tweets.map((tweet) => (
-        <Tweet key={tweet.id} data={tweet} />
+        <Tweet
+          key={tweet.id}
+          data={tweet}
+          active={active}
+          handleToggle={handleToggle}
+        />
       ))}
     </Wrapper>
   );

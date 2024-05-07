@@ -46,15 +46,21 @@ const ButtonWrapper = styled.div`
 `;
 
 type ButtonsProps = {
-  isShow: boolean;
-  onShow: () => void;
   onDelete: () => void;
+  id: string;
+  active: string;
+  handleToggle: (id: string) => void;
 };
 
-export default function Buttons({ isShow, onShow, onDelete }: ButtonsProps) {
+export default function Buttons({
+  onDelete,
+  id,
+  active,
+  handleToggle,
+}: ButtonsProps) {
   return (
     <ButtonWrapper>
-      <Button className={'setting-btn'} onClick={onShow}>
+      <Button className={'setting-btn'} onClick={() => handleToggle(id)}>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -68,7 +74,7 @@ export default function Buttons({ isShow, onShow, onDelete }: ButtonsProps) {
           />
         </svg>
       </Button>
-      {isShow && (
+      {active === id && (
         <div className="setting-btn-list">
           <Button btnType={'Edit'} className={'common-btn'} onClick={() => {}}>
             <svg

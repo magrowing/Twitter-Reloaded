@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { styled } from 'styled-components';
 
 import { auth, db, storage } from '../firebase';
@@ -41,17 +40,14 @@ const Payload = styled.p`
 
 type TweetProps = {
   data: ITweet;
+  active: string;
+  handleToggle: (id: string) => void;
 };
 
-export default function Tweet({ data }: TweetProps) {
+export default function Tweet({ data, active, handleToggle }: TweetProps) {
   const currentUser = auth.currentUser;
 
   const { userName, photo, tweet, userId, id } = data;
-  const [isShow, setShow] = useState(false);
-
-  const onShow = () => {
-    setShow(!isShow);
-  };
 
   const onDelete = async () => {
     const ok = confirm('Are you sure you want to delete this tweet?');
@@ -76,7 +72,12 @@ export default function Tweet({ data }: TweetProps) {
         {photo && <Photo src={photo} alt="image" />}
       </Column>
       {userId === currentUser?.uid && (
-        <Buttons isShow={isShow} onDelete={onDelete} onShow={onShow} />
+        <Buttons
+          onDelete={onDelete}
+          id={id}
+          active={active}
+          handleToggle={handleToggle}
+        />
       )}
     </Wrapper>
   );
