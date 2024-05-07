@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { styled } from 'styled-components';
 
 import PostTweetForm from '../components/PostTweetForm';
@@ -10,10 +12,16 @@ const Wrapper = styled.div`
 `;
 
 export default function Home() {
+  const [editId, setEditId] = useState('');
+
+  const resetEditId = () => {
+    setEditId('');
+  };
+
   return (
     <Wrapper>
-      <PostTweetForm />
-      <TimeLine />
+      <PostTweetForm editId={editId} resetEditId={resetEditId} />
+      <TimeLine setEditId={setEditId} />
     </Wrapper>
   );
 }

@@ -41,9 +41,10 @@ const Payload = styled.p`
 
 type TweetProps = {
   data: ITweet;
+  setEditId: (id: string) => void;
 };
 
-export default function Tweet({ data }: TweetProps) {
+export default function Tweet({ data, setEditId }: TweetProps) {
   const currentUser = auth.currentUser;
 
   const { userName, photo, tweet, userId, id } = data;
@@ -67,6 +68,11 @@ export default function Tweet({ data }: TweetProps) {
     }
   };
 
+  const onEdit = () => {
+    setEditId(id);
+    setShow(false);
+  };
+
   return (
     <Wrapper>
       <ColumnImg>이미지</ColumnImg>
@@ -76,7 +82,12 @@ export default function Tweet({ data }: TweetProps) {
         {photo && <Photo src={photo} alt="image" />}
       </Column>
       {userId === currentUser?.uid && (
-        <Buttons isShow={isShow} onDelete={onDelete} onShow={onShow} />
+        <Buttons
+          isShow={isShow}
+          onDelete={onDelete}
+          onShow={onShow}
+          onEdit={onEdit}
+        />
       )}
     </Wrapper>
   );

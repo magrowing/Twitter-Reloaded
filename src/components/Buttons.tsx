@@ -49,9 +49,15 @@ type ButtonsProps = {
   isShow: boolean;
   onShow: () => void;
   onDelete: () => void;
+  onEdit: () => void;
 };
 
-export default function Buttons({ isShow, onShow, onDelete }: ButtonsProps) {
+export default function Buttons({
+  isShow,
+  onShow,
+  onDelete,
+  onEdit,
+}: ButtonsProps) {
   return (
     <ButtonWrapper>
       <Button className={'setting-btn'} onClick={onShow}>
@@ -70,7 +76,7 @@ export default function Buttons({ isShow, onShow, onDelete }: ButtonsProps) {
       </Button>
       {isShow && (
         <div className="setting-btn-list">
-          <Button btnType={'Edit'} className={'common-btn'} onClick={() => {}}>
+          <Button btnType={'Edit'} className={'common-btn'} onClick={onEdit}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"

@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { auth, db, storage } from '../firebase';
-import { collection, addDoc, updateDoc } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, doc, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 import styled from 'styled-components';
@@ -76,7 +76,15 @@ const SubmitBtn = styled.button`
 
 const MAX_IMAGE_SIZE_BYTES = 1024 * 1024 * 1;
 
-export default function PostTweetForm() {
+type PostTweetFormProps = {
+  editId: string;
+  resetEditId: () => void;
+};
+
+export default function PostTweetForm({
+  editId,
+  resetEditId,
+}: PostTweetFormProps) {
   const [isLoading, setLoading] = useState(false);
   const [tweet, setTweet] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -95,14 +103,6 @@ export default function PostTweetForm() {
         e.target.value = ''; // 동일한 파일할 경우도 있으므로
         return;
       }
-
-      // 이미지 미리보기 기능 추가 방식 1
-      // const reader = new FileReader();
-      // reader.readAsDataURL(files[0]);
-      // reader.onload = () => {
-      //   setImgPath(reader.result as string);
-      // };
-
       // 이미지 미리보기 기능 추가 방식 2
       setImgPath(URL.createObjectURL(files[0]));
       setFile(files[0]);
@@ -117,18 +117,25 @@ export default function PostTweetForm() {
 
     try {
       setLoading(true);
-      const doc = await addDoc(collection(db, 'tweets'), {
-        tweet,
-        createdAt: Date.now(),
-        userName: user.displayName || 'Anonymous',
-        userId: user.uid,
-      });
+      const docRef = editId
+        ? doc(db, 'tweets', `${editId}`)
+        : await addDoc(collection(db, 'tweets'), {
+            tweet,
+            createdAt: Date.now(),
+            userName: user.displayName || 'Anonymous',
+            userId: user.uid,
+          });
+      // tweet글만 수정한 경우
+      if (editId) {
+        await updateDoc(docRef, {
+          tweet,
+        });
+      }
       if (file) {
-        const locationRef = ref(storage, `tweets/${user.uid}/${doc.id}`); // url : tweets 폴더생성 / 유저고유의 아이디 /트윗문서ID 설정
-
+        const locationRef = ref(storage, `tweets/${user.uid}/${docRef.id}`); // url : tweets 폴더생성 / 유저고유의 아이디 /트윗문서ID 설정
         const result = await uploadBytes(locationRef, file);
         const url = await getDownloadURL(result.ref); // 퍼블릭 URL 받음
-        await updateDoc(doc, {
+        await updateDoc(docRef, {
           photo: url,
         });
       }
@@ -136,12 +143,28 @@ export default function PostTweetForm() {
       setTweet('');
       setFile(null);
       setImgPath('');
+      resetEditId(); // 처음전송 및 수정완료되면 수정된 docID 초기회 작업
     } catch (e) {
       console.log(e);
     } finally {
       setLoading(false);
     }
   };
+
+  // firebase에 있는 수정 아이템 정보를 가져와서 화면에 출력
+  useEffect(() => {
+    const fetchTweet = async () => {
+      if (!editId) return;
+      const docRef = doc(db, 'tweets', `${editId}`);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const { tweet, photo } = docSnap.data();
+        setTweet(tweet);
+        setImgPath(photo);
+      }
+    };
+    fetchTweet();
+  }, [editId]);
 
   return (
     <Form onSubmit={onSubmit}>

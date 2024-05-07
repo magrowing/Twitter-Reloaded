@@ -26,7 +26,11 @@ export interface ITweet {
   createdAt: number;
 }
 
-export default function TimeLine() {
+type TimeLineProps = {
+  setEditId: (id: string) => void;
+};
+
+export default function TimeLine({ setEditId }: TimeLineProps) {
   const [tweets, setTweets] = useState<ITweet[]>([]);
 
   useEffect(() => {
@@ -64,7 +68,7 @@ export default function TimeLine() {
   return (
     <Wrapper>
       {tweets.map((tweet) => (
-        <Tweet key={tweet.id} data={tweet} />
+        <Tweet key={tweet.id} data={tweet} setEditId={setEditId} />
       ))}
     </Wrapper>
   );
