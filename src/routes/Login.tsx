@@ -16,6 +16,7 @@ import {
   Error,
   Switcher,
 } from '../styles/authStyle';
+import GoogleButton from '../components/GoogleButton';
 
 export default function Login() {
   const [isLoading, setLoading] = useState(false);
@@ -84,6 +85,7 @@ export default function Login() {
         Forgot your password?{' '}
         <Link to="/find-password">Find Password &rarr;</Link>
       </Switcher>
+      <GoogleButton />
     </Wrapper>
   );
 }
