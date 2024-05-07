@@ -1,10 +1,22 @@
-import React, { useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useState } from 'react';
 
 import styled from 'styled-components';
 
-import { auth, storage } from '../firebase';
+import { auth, db, storage } from '../firebase';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { updateProfile } from 'firebase/auth';
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from 'firebase/firestore';
+
+import { ITweet } from '../components/TimeLine';
+import Tweet from '../components/Tweet';
 
 const Wrapper = styled.div`
   display: flex;
@@ -40,9 +52,27 @@ const Name = styled.p`
   font-size: 22px;
 `;
 
+const Tweets = styled.div`
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 10px;
+`;
+
 export default function Profile() {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
+  const [tweets, setTweets] = useState<ITweet[]>([]);
+
+  const [active, setActive] = useState('');
+
+  const handleToggle = (id: string) => {
+    if (active === id) {
+      setActive('');
+    } else {
+      setActive(id);
+    }
+  };
 
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -67,6 +97,33 @@ export default function Profile() {
     }
   };
 
+  const fetchTweets = async () => {
+    const tweetQuery = query(
+      collection(db, 'tweets'),
+      where('userId', '==', user?.uid),
+      orderBy('createdAt', 'desc'),
+      limit(25)
+    );
+
+    const snapshot = await getDocs(tweetQuery);
+    const tweetsData = snapshot.docs.map((doc) => {
+      const { tweet, createdAt, userId, userName, photo } = doc.data();
+      return {
+        tweet,
+        createdAt,
+        userId,
+        userName,
+        photo,
+        id: doc.id,
+      };
+    });
+    setTweets(tweetsData);
+  };
+
+  useEffect(() => {
+    fetchTweets();
+  }, []);
+
   return (
     <Wrapper>
       <AvatarUpload htmlFor="avatar">
@@ -90,6 +147,16 @@ export default function Profile() {
         onChange={onAvatarChange}
       />
       <Name>{user?.displayName ?? 'Anonymous'}</Name>
+      <Tweets>
+        {tweets.map((tweet) => (
+          <Tweet
+            key={tweet.id}
+            data={tweet}
+            active={active}
+            handleToggle={handleToggle}
+          />
+        ))}
+      </Tweets>
     </Wrapper>
   );
 }
